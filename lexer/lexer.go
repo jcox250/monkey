@@ -138,7 +138,7 @@ func (l *Lexer) peekChar() byte {
 }
 
 func (l *Lexer) skipWhitespace() {
-	if l.char == ' ' || l.char == '\t' || l.char == '\n' || l.char == '\r' || l.char == byte(9) || l.char == byte(10) {
+	for l.char == ' ' || l.char == '\t' || l.char == '\n' || l.char == '\r' {
 		l.readChar()
 	}
 }
