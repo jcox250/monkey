@@ -9,12 +9,12 @@ const (
 	INT   = "INT"
 
 	// Operators
-	ASSIGN  = "="
-	PLUS    = "+"
-	MINUS   = "-"
-	BANG    = "!"
-	ASTERIX = "*"
-	SLASH   = "/"
+	ASSIGN   = "="
+	PLUS     = "+"
+	MINUS    = "-"
+	BANG     = "!"
+	ASTERISK = "*"
+	SLASH    = "/"
 
 	// Comparrison
 	EQ     = "=="
