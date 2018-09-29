@@ -1,6 +1,9 @@
 package lexer
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/jcox250/monkey/token"
 )
 
@@ -26,11 +29,22 @@ func NewLexer(input string) *Lexer {
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
+	if l.char == byte(9) {
+		fmt.Println("FOUND A TAB")
+	}
+
 	l.skipWhitespace()
 
 	switch l.char {
 	case '=':
-		tok = token.NewToken(token.ASSIGN, l.char)
+		if l.peekChar() == '=' {
+			char := l.char
+			l.readChar()
+			literal := fmt.Sprintf("%s%s", string(char), string(l.char))
+			tok = token.Token{Type: token.EQ, Literal: literal}
+		} else {
+			tok = token.NewToken(token.ASSIGN, l.char)
+		}
 	case ';':
 		tok = token.NewToken(token.SEMICOLON, l.char)
 	case '(':
@@ -41,6 +55,25 @@ func (l *Lexer) NextToken() token.Token {
 		tok = token.NewToken(token.COMMA, l.char)
 	case '+':
 		tok = token.NewToken(token.PLUS, l.char)
+	case '-':
+		tok = token.NewToken(token.MINUS, l.char)
+	case '!':
+		if l.peekChar() == '=' {
+			char := l.char
+			l.readChar()
+			literal := fmt.Sprintf("%s%s", string(char), string(l.char))
+			tok = token.Token{Type: token.NOT_EQ, Literal: literal}
+		} else {
+			tok = token.NewToken(token.BANG, l.char)
+		}
+	case '/':
+		tok = token.NewToken(token.SLASH, l.char)
+	case '*':
+		tok = token.NewToken(token.ASTERIX, l.char)
+	case '<':
+		tok = token.NewToken(token.LT, l.char)
+	case '>':
+		tok = token.NewToken(token.GT, l.char)
 	case '{':
 		tok = token.NewToken(token.LBRACE, l.char)
 	case '}':
@@ -58,6 +91,7 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Type = token.INT
 			return tok
 		} else {
+			log.Println("illegal character ", l.char)
 			tok = token.NewToken(token.ILLEGAL, l.char)
 		}
 	}
@@ -95,8 +129,16 @@ func (l *Lexer) readNumber() string {
 	return l.input[position:l.position]
 }
 
+func (l *Lexer) peekChar() byte {
+	if l.readPosition >= len(l.input) {
+		return 0
+	} else {
+		return l.input[l.readPosition]
+	}
+}
+
 func (l *Lexer) skipWhitespace() {
-	if l.char == ' ' || l.char == '\t' || l.char == '\n' || l.char == '\r' {
+	if l.char == ' ' || l.char == '\t' || l.char == '\n' || l.char == '\r' || l.char == byte(9) || l.char == byte(10) {
 		l.readChar()
 	}
 }
