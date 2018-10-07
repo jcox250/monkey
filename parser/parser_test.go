@@ -282,3 +282,71 @@ func TestParsingInfixExpressions(t *testing.T) {
 		}
 	}
 }
+
+func TestOperatorPrecedenceParsing(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{
+			input:    "-a * b",
+			expected: "((-a) * b)",
+		},
+		{
+			input:    "!-a",
+			expected: "(!(-a))",
+		},
+		{
+			input:    "a + b + c",
+			expected: "((a + b) + c)",
+		},
+		{
+			input:    "a + b - c",
+			expected: "((a + b) - c)",
+		},
+		{
+			input:    "a * b * c",
+			expected: "((a * b) * c)",
+		},
+		{
+			input:    "a * b / c",
+			expected: "((a * b) / c)",
+		},
+		{
+			input:    "a + b / c",
+			expected: "(a + (b / c))",
+		},
+		{
+			input:    "a + b * c + d / e - f",
+			expected: "(((a + (b * c)) + (d / e)) - f)",
+		},
+		{
+			input:    "3 + 4; -5 * 5",
+			expected: "(3 + 4)((-5) * 5)",
+		},
+		{
+			input:    "5 > 4 == 3 < 4",
+			expected: "((5 > 4) == (3 < 4))",
+		},
+		{
+			input:    "5 < 4 != 3 < 4",
+			expected: "((5 < 4) != (3 < 4))",
+		},
+		{
+			input:    "3 + 4 * 5 == 3 * 1 + 4 * 5",
+			expected: "((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))",
+		},
+	}
+
+	for _, tt := range tests {
+		lexer := lexer.NewLexer(tt.input)
+		parser := NewParser(lexer)
+		program := parser.ParseProgram()
+		checkParserErrors(t, parser)
+
+		actual := program.String()
+		if actual != tt.expected {
+			t.Errorf("expected=%q, got=%q", tt.expected, actual)
+		}
+	}
+}

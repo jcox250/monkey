@@ -26,6 +26,7 @@ func (i *InfixExpression) String() string {
 	out.WriteString("(")
 	out.WriteString(i.Left.String())
 	out.WriteString(fmt.Sprintf(" %s ", i.Operator))
+	out.WriteString(i.Right.String())
 	out.WriteString(")")
 
 	return out.String()
